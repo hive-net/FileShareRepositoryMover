@@ -14,6 +14,8 @@ namespace FileShareRepositoryMover.Services
         public static LocalFile GetFile(string fileId, string fileName, string blobFileName)
         {
             string folderPath = "C:\\Temp\\Mover";
+            string fileUrl = System.Configuration.ConfigurationManager.AppSettings["Website"].ToString();
+            fileUrl = @"https://" + fileUrl + @"/index.php?option=com_easysocial&view=groups&layout=preview&fileid=" + fileId + @"&tmpl=component";
 
             if (!Directory.Exists(folderPath))
             {
@@ -22,8 +24,8 @@ namespace FileShareRepositoryMover.Services
 
             LocalFile fileData = new LocalFile();
             fileData.FileName = fileName;
-            fileData.FilePath = folderPath + "\\" + fileName;
-            fileData.Url = "";
+            fileData.FilePath = folderPath + "\\" + blobFileName;
+            fileData.Url = fileUrl;
 
             return fileData;
         }

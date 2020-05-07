@@ -296,7 +296,10 @@ namespace FileShareRepositoryMover.Services
                 fileManager.BlobFileName = blobFileName;
                 fileManager.ContainerName = ""; //NEED TO ADD CONTAINER NAME
                 fileManager.FilePath = local.FilePath;
-                fileManager.UploadStreamToBlob();
+                string returnedBlobName = fileManager.UploadStreamToBlob();
+
+                Console.WriteLine("COPIED " + local.FileName + " TO BLOB: " + blobFileName);
+                Console.WriteLine("SAVED LOCALLY TO: " + local.FilePath);
             }
         }
 

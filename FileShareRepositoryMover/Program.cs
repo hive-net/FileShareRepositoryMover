@@ -10,6 +10,9 @@ namespace FileShareRepositoryMover
     {
         static void Main(string[] args)
         {
+            Services.TransferData transferData = new Services.TransferData();
+            Console.WriteLine("MIGRATION COMPLETE");
+            Console.ReadLine();
         }
     }
 }
