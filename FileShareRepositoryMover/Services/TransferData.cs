@@ -289,14 +289,14 @@ namespace FileShareRepositoryMover.Services
 
                 string blobFileName = resource.ResourceId.ToString().Replace("-","");
 
-                InsertResources(resource);
-                resources.Add(resource);
                 LocalFile local = DownloadFile.GetFile(file.id.ToString(), file.name, blobFileName);
                 BlobFileManager fileManager = new BlobFileManager();
                 fileManager.BlobFileName = blobFileName;
                 fileManager.ContainerName = System.Configuration.ConfigurationManager.AppSettings["BlobContainer"].ToString().ToLower();
                 fileManager.FilePath = local.FilePath;
                 string returnedBlobName = fileManager.UploadStreamToBlob();
+                InsertResources(resource);
+                resources.Add(resource);
 
                 Console.WriteLine("COPIED " + local.FileName + " TO BLOB: " + blobFileName);
                 Console.WriteLine("SAVED LOCALLY TO: " + local.FilePath);
