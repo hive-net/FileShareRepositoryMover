@@ -294,7 +294,7 @@ namespace FileShareRepositoryMover.Services
                 LocalFile local = DownloadFile.GetFile(file.id.ToString(), file.name, blobFileName);
                 BlobFileManager fileManager = new BlobFileManager();
                 fileManager.BlobFileName = blobFileName;
-                fileManager.ContainerName = ""; //NEED TO ADD CONTAINER NAME
+                fileManager.ContainerName = System.Configuration.ConfigurationManager.AppSettings["BlobContainer"].ToString().ToLower();
                 fileManager.FilePath = local.FilePath;
                 string returnedBlobName = fileManager.UploadStreamToBlob();
 

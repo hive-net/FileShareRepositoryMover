@@ -13,6 +13,9 @@ namespace FileShareRepositoryMover.Services
     {
         public static LocalFile GetFile(string fileId, string fileName, string blobFileName)
         {
+            string userName = System.Configuration.ConfigurationManager.AppSettings["UserName"].ToString();
+            string password = System.Configuration.ConfigurationManager.AppSettings["Password"].ToString();
+
             string folderPath = "C:\\Temp\\Mover";
             string fileUrl = System.Configuration.ConfigurationManager.AppSettings["Website"].ToString();
             fileUrl = @"https://" + fileUrl + @"/index.php?option=com_easysocial&view=groups&layout=preview&fileid=" + fileId + @"&tmpl=component";
@@ -26,6 +29,10 @@ namespace FileShareRepositoryMover.Services
             fileData.FileName = fileName;
             fileData.FilePath = folderPath + "\\" + blobFileName;
             fileData.Url = fileUrl;
+
+            //***********************************************
+            //USE WEBCLIENT TO DOWNLOAD FILE TO FILEPATH HERE
+            //***********************************************
 
             return fileData;
         }
