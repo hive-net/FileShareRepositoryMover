@@ -134,7 +134,7 @@ namespace FileShareRepositoryMover.Services
             return folder.FolderId;
         }
 
-        private Guid CheckForTopLevelFolder()
+        private Guid? CheckForTopLevelFolder()
         {
             string checkForFolder = @"SELECT FolderId FROM Folders WHERE CommunityId = @CommunityId AND FolderLevel = @FolderLevel;";
             Dictionary<string, dynamic> parameters = new Dictionary<string, dynamic>();
@@ -287,8 +287,16 @@ namespace FileShareRepositoryMover.Services
                 resource.ResourceId = Guid.NewGuid();
                 resource.ResourceName = file.name;
 
+                string blobFileName = resource.ResourceId.ToString().Replace("-","");
+
                 InsertResources(resource);
                 resources.Add(resource);
+                LocalFile local = DownloadFile.GetFile(file.id.ToString(), file.name, blobFileName);
+                BlobFileManager fileManager = new BlobFileManager();
+                fileManager.BlobFileName = blobFileName;
+                fileManager.ContainerName = ""; //NEED TO ADD CONTAINER NAME
+                fileManager.FilePath = local.FilePath;
+                fileManager.UploadStreamToBlob();
             }
         }
 

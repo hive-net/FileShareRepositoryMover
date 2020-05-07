@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
 
@@ -18,41 +19,28 @@ namespace FileShareRepositoryMover.Services
         public Dictionary<string, string> MetaData { get; set; }
         public string ContainerName { get; set; }
         public string BlobFileName { get; set; }
-        /*
-        public async Task<BlobSasInfo> GetBlobSasUri(Guid communityId, string blobFileName)
+        public string FileName { get; set; }
+        public string FilePath { get; set; }
+
+        public string UploadStreamToBlob()
         {
-            var storageAccount = CloudStorageAccount.Parse(_connectionString);
-            var blobClient = storageAccount.CreateCloudBlobClient();
-            var blobContainer = blobClient.GetContainerReference(Utilities.GuidToString(communityId));
-            await blobContainer.CreateIfNotExistsAsync();
-
-            // Get a reference to a blob within the container.
-            // Note that the blob may not exist yet, but a SAS can still be created for it.
-            var blob = blobContainer.GetBlockBlobReference(blobFileName);
-
-            // Create a new access policy and define its constraints.
-            // Note that the SharedAccessBlobPolicy class is used both to define the parameters of an ad hoc SAS, and
-            // to construct a shsared access policy that is saved to the container's shared access policies.
-            var adHocSas = new SharedAccessBlobPolicy()
+            MetaData.Add("FileName", FileName);
+            ContainerName = ContainerName.ToLower();
+            CloudStorageAccount storageAccount = CloudStorageAccount.Parse(_connectionString);
+            CloudBlobClient blobClient = storageAccount.CreateCloudBlobClient();
+            CloudBlobContainer blobContainer = blobClient.GetContainerReference(ContainerName);
+            blobContainer.CreateIfNotExistsAsync();
+            BlobFileName = BlobFileName;
+            CloudBlockBlob blockBlob = blobContainer.GetBlockBlobReference(BlobFileName);
+            foreach (KeyValuePair<string, string> pair in MetaData)
             {
-                // When the start time for the SAS is omitted, the start time is assumed to be the time when the storage service receives the request.
-                // Omitting the start time for a SAS that is effective immediately helps to avoid clock skew.
-                SharedAccessExpiryTime = DateTime.UtcNow.AddMinutes(5),
-                Permissions = SharedAccessBlobPermissions.Read | SharedAccessBlobPermissions.Write |
-                              SharedAccessBlobPermissions.Create | SharedAccessBlobPermissions.List
-            };
-
-            // Generate the shared access signature on the blob, setting the constraints directly on the signature.
-            var sasBlobToken = blobContainer.GetSharedAccessSignature(adHocSas);
-
-            // Return the URI string for the container, including the SAS token.
-            return new BlobSasInfo
+                blockBlob.Metadata.Add(pair.Key, pair.Value);
+            }
+            using (System.IO.Stream stream = System.IO.File.OpenRead(FilePath))
             {
-                Uri = blob.Uri + sasBlobToken,
-                ContainerName = blobContainer.Name,
-                BlobFileName = blobFileName
-            };
+                blockBlob.UploadFromStreamAsync(stream);
+            }
+            return BlobFileName;
         }
-        */
     }
 }
