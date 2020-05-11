@@ -288,12 +288,14 @@ namespace FileShareRepositoryMover.Services
                 resource.ResourceName = file.name;
 
                 string blobFileName = resource.ResourceId.ToString().Replace("-","");
+                blobFileName += System.IO.Path.GetExtension(file.name);
 
                 LocalFile local = DownloadFile.GetFile(file.id.ToString(), file.name, blobFileName);
                 BlobFileManager fileManager = new BlobFileManager();
                 fileManager.BlobFileName = blobFileName;
                 fileManager.ContainerName = System.Configuration.ConfigurationManager.AppSettings["BlobContainer"].ToString().ToLower();
                 fileManager.FilePath = local.FilePath;
+                fileManager.FolderName = communityId.ToString().Replace("-", "");
                 string returnedBlobName = fileManager.UploadStreamToBlob();
                 InsertResources(resource);
                 resources.Add(resource);

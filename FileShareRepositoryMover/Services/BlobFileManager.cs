@@ -12,7 +12,7 @@ namespace FileShareRepositoryMover.Services
         private readonly string _connectionString;
         public BlobFileManager()
         {
-            _connectionString = System.Configuration.ConfigurationManager.ConnectionStrings["CollabConnectionString"].ToString();
+            _connectionString = System.Configuration.ConfigurationManager.ConnectionStrings["BlobConnectionString"].ToString();
             MetaData = new Dictionary<string, string>();
         }
 
@@ -21,6 +21,7 @@ namespace FileShareRepositoryMover.Services
         public string BlobFileName { get; set; }
         public string FileName { get; set; }
         public string FilePath { get; set; }
+        public string FolderName { get; set; }
 
         public string UploadStreamToBlob()
         {
@@ -30,8 +31,10 @@ namespace FileShareRepositoryMover.Services
             CloudBlobClient blobClient = storageAccount.CreateCloudBlobClient();
             CloudBlobContainer blobContainer = blobClient.GetContainerReference(ContainerName);
             blobContainer.CreateIfNotExistsAsync();
+            CloudBlobDirectory blobFolder = blobContainer.GetDirectoryReference(FolderName);
             BlobFileName = BlobFileName;
-            CloudBlockBlob blockBlob = blobContainer.GetBlockBlobReference(BlobFileName);
+            //CloudBlockBlob blockBlob = blobContainer.GetBlockBlobReference(BlobFileName);
+            CloudBlockBlob blockBlob = blobFolder.GetBlockBlobReference(BlobFileName);
             foreach (KeyValuePair<string, string> pair in MetaData)
             {
                 blockBlob.Metadata.Add(pair.Key, pair.Value);
