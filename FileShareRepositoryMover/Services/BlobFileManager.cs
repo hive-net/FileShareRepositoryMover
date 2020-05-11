@@ -27,6 +27,7 @@ namespace FileShareRepositoryMover.Services
         {
             MetaData.Add("FileName", FileName);
             ContainerName = ContainerName.ToLower();
+            ContainerName = "testarea";
             CloudStorageAccount storageAccount = CloudStorageAccount.Parse(_connectionString);
             CloudBlobClient blobClient = storageAccount.CreateCloudBlobClient();
             CloudBlobContainer blobContainer = blobClient.GetContainerReference(ContainerName);
@@ -41,7 +42,7 @@ namespace FileShareRepositoryMover.Services
             }
             using (System.IO.Stream stream = System.IO.File.OpenRead(FilePath))
             {
-                blockBlob.UploadFromStreamAsync(stream);
+                blockBlob.UploadFromStream(stream);
             }
             return BlobFileName;
         }
