@@ -31,10 +31,10 @@ namespace FileShareRepositoryMover.Services
             CloudBlobClient blobClient = storageAccount.CreateCloudBlobClient();
             CloudBlobContainer blobContainer = blobClient.GetContainerReference(ContainerName);
             blobContainer.CreateIfNotExistsAsync();
-            CloudBlobDirectory blobFolder = blobContainer.GetDirectoryReference(FolderName);
-            BlobFileName = BlobFileName;
-            //CloudBlockBlob blockBlob = blobContainer.GetBlockBlobReference(BlobFileName);
-            CloudBlockBlob blockBlob = blobFolder.GetBlockBlobReference(BlobFileName);
+            BlobFileName = FolderName + "//" + BlobFileName;
+            //CloudBlobDirectory blobFolder = blobContainer.GetDirectoryReference(FolderName);
+            CloudBlockBlob blockBlob = blobContainer.GetBlockBlobReference(BlobFileName);
+            //CloudBlockBlob blockBlob = blobFolder.GetBlockBlobReference(BlobFileName);
             foreach (KeyValuePair<string, string> pair in MetaData)
             {
                 blockBlob.Metadata.Add(pair.Key, pair.Value);

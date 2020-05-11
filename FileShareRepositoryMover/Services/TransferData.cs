@@ -297,8 +297,8 @@ namespace FileShareRepositoryMover.Services
                 fileManager.FilePath = local.FilePath;
                 fileManager.FolderName = communityId.ToString().Replace("-", "");
                 string returnedBlobName = fileManager.UploadStreamToBlob();
-                InsertResources(resource);
-                resources.Add(resource);
+                //InsertResources(resource);
+                //resources.Add(resource);
 
                 Console.WriteLine("COPIED " + local.FileName + " TO BLOB: " + blobFileName);
                 Console.WriteLine("SAVED LOCALLY TO: " + local.FilePath);
