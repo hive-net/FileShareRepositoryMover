@@ -17,7 +17,7 @@ namespace FileShareRepositoryMover.Services
             social_Files = new List<jos_social_files>();
             resources = new List<Resources>();
 
-            //ClearLastMove();
+            ClearLastMove();
             //PopulateCollections();
             //AddTopLevelFolder();
             //SetHomeFolder();
@@ -42,7 +42,7 @@ namespace FileShareRepositoryMover.Services
         private List<jos_social_files> social_Files;
         private List<Resources> resources;
 
-        /*
+        
         private void ClearLastMove()
         {
             string query = @"DELETE Resources WHERE CommunityId = @CommunityId AND ModifiedBy = 'RepositoryMover'; SELECT GETDATE()";
@@ -52,6 +52,7 @@ namespace FileShareRepositoryMover.Services
             DataSet results = MssqlActions.QueryResults(mssqlConnection, query, parameters);
         }
 
+        /*
         private void PopulateCollections()
         {
             //collections = new List<jos_social_files_collections>();
@@ -369,6 +370,27 @@ namespace FileShareRepositoryMover.Services
                 {
                     jos_social_files file = new jos_social_files();
                     file.collection_id = Convert.ToInt32(row["collection_id"]);
+                    file.created = Convert.ToDateTime(row["created"]);
+                    file.hash = row["hash"].ToString();
+                    file.hits = Convert.ToInt32(row["hits"]);
+                    file.id = Convert.ToInt32(row["id"]);
+                    file.mime = row["mime"].ToString();
+                    file.name = row["name"].ToString();
+                    file.size = Convert.ToInt32(row["size"]);
+                    file.state = Convert.ToInt32(row["state"]);
+                    file.storage = row["storage"].ToString();
+                    file.type = row["type"].ToString();
+                    file.uid = Convert.ToInt32(row["uid"]);
+                    file.user_id = Convert.ToInt32(row["user_id"]);
+
+                    file.name = file.name.Replace("’", "");
+
+                    social_Files.Add(file);
+                }
+                else if (folderDictionary.ContainsKey(Convert.ToInt32(row["uid"])))
+                {
+                    jos_social_files file = new jos_social_files();
+                    file.collection_id = Convert.ToInt32(row["uid"]);
                     file.created = Convert.ToDateTime(row["created"]);
                     file.hash = row["hash"].ToString();
                     file.hits = Convert.ToInt32(row["hits"]);
