@@ -27,18 +27,25 @@ namespace FileShareRepositoryMover.Services
         {
             MetaData.Add("FileName", FileName);
             ContainerName = ContainerName.ToLower();
-            ContainerName = "testarea";
+            //ContainerName = "testarea";
             CloudStorageAccount storageAccount = CloudStorageAccount.Parse(_connectionString);
             CloudBlobClient blobClient = storageAccount.CreateCloudBlobClient();
             CloudBlobContainer blobContainer = blobClient.GetContainerReference(ContainerName);
             blobContainer.CreateIfNotExistsAsync();
-            BlobFileName = FolderName + "//" + BlobFileName;
-            //CloudBlobDirectory blobFolder = blobContainer.GetDirectoryReference(FolderName);
-            CloudBlockBlob blockBlob = blobContainer.GetBlockBlobReference(BlobFileName);
-            //CloudBlockBlob blockBlob = blobFolder.GetBlockBlobReference(BlobFileName);
+            //BlobFileName = FolderName + "//" + BlobFileName;
+            CloudBlobDirectory blobFolder = blobContainer.GetDirectoryReference(FolderName);
+            //CloudBlockBlob blockBlob = blobContainer.GetBlockBlobReference(BlobFileName);
+            CloudBlockBlob blockBlob = blobFolder.GetBlockBlobReference(BlobFileName);
             foreach (KeyValuePair<string, string> pair in MetaData)
             {
-                blockBlob.Metadata.Add(pair.Key, pair.Value);
+                if (pair.Value != null)
+                {
+                    blockBlob.Metadata.Add(pair.Key, pair.Value);
+                }
+                else
+                {
+                    blockBlob.Metadata.Add(pair.Key, "");
+                }
             }
             using (System.IO.Stream stream = System.IO.File.OpenRead(FilePath))
             {

@@ -19,6 +19,7 @@ namespace FileShareRepositoryMover.Services
 
             PopulateCollections();
             AddTopLevelFolder();
+            SetHomeFolder();
             BuildFolderDictionary();
             GetFiles();
             PopulateResources();
@@ -89,8 +90,8 @@ namespace FileShareRepositoryMover.Services
                     ParentFolderId = null,
                     FolderLevel = 0,
                     FolderName = "",
-                    ClusterId = null,
-                    ClusterType = null
+                    ClusterId = "125",
+                    ClusterType = 2
                 };
 
                 AddFolder(newFolder);
@@ -161,6 +162,64 @@ namespace FileShareRepositoryMover.Services
             }
         }
 
+        private void SetHomeFolder()
+        {
+            string checkForFolder = @"SELECT FolderId FROM Folders WHERE CommunityId = @CommunityId AND FolderLevel = @FolderLevel AND FolderName = 'Home';";
+            Dictionary<string, dynamic> parameters = new Dictionary<string, dynamic>();
+
+            parameters.Add("CommunityId", communityId);
+            parameters.Add("FolderLevel", 1);
+
+            DataSet results = MssqlActions.QueryResults(mssqlConnection, checkForFolder, parameters);
+
+            string homeId;
+
+            try
+            {
+                if (results.Tables[0].Rows[0][0].ToString() != null)
+                {
+                    if (results.Tables[0].Rows.Count > 0)
+                    {
+                        homeId = results.Tables[0].Rows[0][0].ToString();
+                    }
+                    else
+                    {
+                        homeId = null;
+                    }
+                }
+                else
+                {
+                    homeId = null;
+                }
+            }
+            catch
+            {
+                homeId = null;
+            }
+
+            if (homeId != null)
+            {
+                topFolderId = Guid.Parse(homeId);
+            }
+            else
+            {
+                topFolderId = Guid.NewGuid();
+
+                Folders newFolder = new Folders
+                {
+                    FolderId = topFolderId,
+                    CommunityId = communityId,
+                    ParentFolderId = null,
+                    FolderLevel = 1,
+                    FolderName = "Home",
+                    ClusterId = "125",
+                    ClusterType = 2
+                };
+
+                AddFolder(newFolder);
+            }
+        }
+
         private Guid? GetFolderId(jos_social_files_collections collection)
         {
             string checkForFolder = @"SELECT FolderId FROM Folders WHERE CommunityId = @CommunityId AND FolderName = @FolderName AND FolderLevel = @FolderLevel;";
@@ -170,27 +229,34 @@ namespace FileShareRepositoryMover.Services
             parameters.Add("Foldername", collection.title);
             if (collection.id == 0)
             {
-                parameters.Add("FolderLevel", 0);
+                parameters.Add("FolderLevel", 1);
             }
             else
             {
-                parameters.Add("FolderLevel", 1);
+                parameters.Add("FolderLevel", 2);
             }
 
             DataSet results = MssqlActions.QueryResults(mssqlConnection, checkForFolder, parameters);
 
-            if (results.Tables[0].Rows[0][0].ToString() != null)
+            try
             {
-                if (results.Tables[0].Rows.Count > 0)
+                if (results.Tables[0].Rows[0][0].ToString() != null)
                 {
-                    return Guid.Parse(results.Tables[0].Rows[0][0].ToString());
+                    if (results.Tables[0].Rows.Count > 0)
+                    {
+                        return Guid.Parse(results.Tables[0].Rows[0][0].ToString());
+                    }
+                    else
+                    {
+                        return null;
+                    }
                 }
                 else
                 {
                     return null;
                 }
             }
-            else
+            catch
             {
                 return null;
             }
@@ -206,7 +272,7 @@ namespace FileShareRepositoryMover.Services
                 {
                     folder.CommunityId = communityId;
                     folder.ParentFolderId = topFolderId;
-                    folder.FolderLevel = 1;
+                    folder.FolderLevel = 2;
                     folder.FolderName = collection.title;
                     folder.ClusterType = null;
                     folder.ClusterId = null;
@@ -275,8 +341,8 @@ namespace FileShareRepositoryMover.Services
             foreach (jos_social_files file in social_Files)
             {
                 Resources resource = new Resources();
-                resource.ClusterId = null;
-                resource.ClusterType = null;
+                resource.ClusterId = "125";
+                resource.ClusterType = 2;
                 resource.CommunityId = communityId;
                 resource.DeletedOn = null;
                 resource.FolderId = folderDictionary[file.collection_id].FolderId;
@@ -293,12 +359,13 @@ namespace FileShareRepositoryMover.Services
                 LocalFile local = DownloadFile.GetFile(file.id.ToString(), file.name, blobFileName);
                 BlobFileManager fileManager = new BlobFileManager();
                 fileManager.BlobFileName = blobFileName;
+                fileManager.FileName = file.name;
                 fileManager.ContainerName = System.Configuration.ConfigurationManager.AppSettings["BlobContainer"].ToString().ToLower();
                 fileManager.FilePath = local.FilePath;
                 fileManager.FolderName = communityId.ToString().Replace("-", "");
                 string returnedBlobName = fileManager.UploadStreamToBlob();
-                //InsertResources(resource);
-                //resources.Add(resource);
+                InsertResources(resource);
+                resources.Add(resource);
 
                 Console.WriteLine("COPIED " + local.FileName + " TO BLOB: " + blobFileName);
                 Console.WriteLine("SAVED LOCALLY TO: " + local.FilePath);
@@ -310,6 +377,7 @@ namespace FileShareRepositoryMover.Services
             string insertResource = @"INSERT INTO Resources (
     ResourceId,
     CommunityId,
+    FolderId,
     ResourceName,
     ResourceDescription,
     Metadata,
@@ -321,6 +389,7 @@ namespace FileShareRepositoryMover.Services
     (
     @ResourceId,
     @CommunityId,
+    @FolderId,
     @ResourceName,
     @ResourceDescription,
     @MetaData,
@@ -334,6 +403,7 @@ namespace FileShareRepositoryMover.Services
 
             parameters.Add("ResourceId", resource.ResourceId);
             parameters.Add("CommunityId", resource.CommunityId);
+            parameters.Add("FolderId", resource.FolderId);
             parameters.Add("ResourceName", resource.ResourceName);
             parameters.Add("ResourceDescription", resource.ResourceDescription);
             parameters.Add("Metadata", resource.Metadata);
