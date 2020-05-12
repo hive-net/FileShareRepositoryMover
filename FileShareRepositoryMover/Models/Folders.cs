@@ -12,5 +12,6 @@ namespace FileShareRepositoryMover.Models
         public string FolderName { get; set; }
         public int? ClusterType { get; set; }
         public string ClusterId { get; set; }
+        public DateTime CreatedOn { get; set; }
     }
 }

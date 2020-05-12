@@ -180,6 +180,7 @@
   <ItemGroup>
     <Compile Include="Models\BlobResources.cs" />
     <Compile Include="Models\Folders.cs" />
+    <Compile Include="Models\jos_social_clusters.cs" />
     <Compile Include="Models\jos_social_files.cs" />
     <Compile Include="Models\jos_social_files_collections.cs" />
     <Compile Include="Models\LocalFile.cs" />
@@ -188,6 +189,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\BlobFileManager.cs" />
     <Compile Include="Services\DownloadFile.cs" />
+    <Compile Include="Services\FolderStructure.cs" />
     <Compile Include="Services\MssqlActions.cs" />
     <Compile Include="Services\MysqlActions.cs" />
     <Compile Include="Services\TransferData.cs" />

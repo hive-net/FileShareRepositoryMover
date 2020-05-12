@@ -18,10 +18,15 @@ namespace FileShareRepositoryMover.Services
             resources = new List<Resources>();
 
             //ClearLastMove();
-            PopulateCollections();
-            AddTopLevelFolder();
+            //PopulateCollections();
+            //AddTopLevelFolder();
             //SetHomeFolder();
-            BuildFolderDictionary();
+            //BuildFolderDictionary();
+
+            FolderStructure folderStructure = new FolderStructure();
+
+            folderDictionary = folderStructure.GetFolders();
+
             GetFiles();
             PopulateResources();
         }
@@ -37,6 +42,7 @@ namespace FileShareRepositoryMover.Services
         private List<jos_social_files> social_Files;
         private List<Resources> resources;
 
+        /*
         private void ClearLastMove()
         {
             string query = @"DELETE Resources WHERE CommunityId = @CommunityId AND ModifiedBy = 'RepositoryMover'; SELECT GETDATE()";
@@ -108,7 +114,9 @@ namespace FileShareRepositoryMover.Services
             }
 
         }
+        */
 
+        /*
         private Guid AddFolder(Folders folder)
         {
             string insertFolder = @"INSERT INTO Folders (
@@ -144,7 +152,9 @@ namespace FileShareRepositoryMover.Services
 
             return folder.FolderId;
         }
+        */
 
+        /*
         private Guid? CheckForTopLevelFolder()
         {
             string checkForFolder = @"SELECT FolderId FROM Folders WHERE CommunityId = @CommunityId AND FolderLevel = @FolderLevel;";
@@ -236,7 +246,9 @@ namespace FileShareRepositoryMover.Services
                 AddFolder(newFolder);
             }
         }
+        */
 
+        /*
         private Guid? GetFolderId(jos_social_files_collections collection)
         {
             string checkForFolder = @"SELECT FolderId FROM Folders WHERE CommunityId = @CommunityId AND FolderName = @FolderName AND FolderLevel = @FolderLevel;";
@@ -278,7 +290,9 @@ namespace FileShareRepositoryMover.Services
                 return null;
             }
         }
+        */
 
+        /*
         private void BuildFolderDictionary()
         {
             //folderDictionary = new Dictionary<int, Folders>();
@@ -340,6 +354,7 @@ namespace FileShareRepositoryMover.Services
                 folderDictionary.Add(collection.id, folder);
             }
         }
+        */
 
         private void GetFiles()
         {
@@ -403,8 +418,18 @@ namespace FileShareRepositoryMover.Services
                 resource.ClusterType = 2;
                 resource.CommunityId = communityId;
                 resource.DeletedOn = null;
-                resource.FolderId = folderDictionary[file.collection_id].FolderId;
+
+                if (folderDictionary.ContainsKey(file.collection_id))
+                {
+                    resource.FolderId = folderDictionary[file.collection_id].FolderId;
+                }
+                else
+                {
+                    resource.FolderId = folderDictionary[72].FolderId;
+                }
+
                 resource.Metadata = null;
+                resource.Mime = file.mime;
                 resource.ModifiedBy = "RepositoryMover";
                 resource.ModifiedOn = DateTime.Now;
                 resource.ResourceDescription = null;
@@ -423,7 +448,7 @@ namespace FileShareRepositoryMover.Services
                 fileManager.FolderName = communityId.ToString().Replace("-", "");
                 string returnedBlobName = fileManager.UploadStreamToBlob();
                 InsertResources(resource);
-                InsertBlobResource(communityId, resource.ResourceId, blobFileName);
+                InsertBlobResource(communityId, resource.ResourceId, blobFileName, resource.Mime);
                 resources.Add(resource);
 
                 Console.WriteLine("COPIED " + local.FileName + " TO BLOB: " + blobFileName);
@@ -431,13 +456,14 @@ namespace FileShareRepositoryMover.Services
             }
         }
 
-        private void InsertBlobResource(Guid CommunityId, Guid ResourceId, string BlobFileName)
+        private void InsertBlobResource(Guid CommunityId, Guid ResourceId, string BlobFileName, string BlobFileType)
         {
-            string query = @"INSERT INTO BlobResources (CommunityId,ResourceId,BlobFileName) VALUES (@CommunityId,@ResourceId,@BlobFileName); SELECT GETDATE();";
+            string query = @"INSERT INTO BlobResources (CommunityId,ResourceId,BlobFileName,BlobFileType) VALUES (@CommunityId,@ResourceId,@BlobFileName,@BlobFileType); SELECT GETDATE();";
             Dictionary<string, dynamic> parameters = new Dictionary<string, dynamic>();
             parameters.Add("CommunityId", CommunityId);
             parameters.Add("ResourceId", ResourceId);
             parameters.Add("BlobFileName", BlobFileName);
+            parameters.Add("BlobFileType", BlobFileType);
 
             DataSet results = MssqlActions.QueryResults(mssqlConnection, query, parameters);
         }
