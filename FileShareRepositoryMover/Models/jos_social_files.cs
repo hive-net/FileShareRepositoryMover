@@ -11,7 +11,7 @@ namespace FileShareRepositoryMover.Models
         public int? hits { get; set; }
         public string hash { get; set; }
         public string sub { get; set; }
-        public int? uid { get; set; }
+        public int uid { get; set; }
         public string type { get; set; }
         public DateTime? created { get; set; }
         public int? user_id { get; set; }

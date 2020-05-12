@@ -18,6 +18,7 @@ namespace FileShareRepositoryMover.Services
             resources = new List<Resources>();
 
             ClearLastMove();
+            //CleanupBobResources();
             //PopulateCollections();
             //AddTopLevelFolder();
             //SetHomeFolder();
@@ -26,6 +27,21 @@ namespace FileShareRepositoryMover.Services
             FolderStructure folderStructure = new FolderStructure();
 
             folderDictionary = folderStructure.GetFolders();
+
+            sharedCommunityResources = null;
+
+            foreach (KeyValuePair<int, Folders> folder in folderDictionary)
+            {
+                if (folder.Value.FolderName == "Shared Community Resources")
+                {
+                    sharedCommunityResources = folder.Key.ToString();
+                }
+            }
+
+            if (sharedCommunityResources == null)
+            {
+                sharedCommunityResources = "0";
+            }
 
             GetFiles();
             PopulateResources();
@@ -38,6 +54,7 @@ namespace FileShareRepositoryMover.Services
         private List<jos_social_files_collections> collections;
         private Dictionary<int, Folders> folderDictionary;
         private Guid topFolderId;
+        private string sharedCommunityResources;
 
         private List<jos_social_files> social_Files;
         private List<Resources> resources;
@@ -46,6 +63,21 @@ namespace FileShareRepositoryMover.Services
         private void ClearLastMove()
         {
             string query = @"DELETE Resources WHERE CommunityId = @CommunityId AND ModifiedBy = 'RepositoryMover'; SELECT GETDATE()";
+            Dictionary<string, dynamic> parameters = new Dictionary<string, dynamic>();
+            parameters.Add("CommunityId", communityId.ToString());
+
+            DataSet results = MssqlActions.QueryResults(mssqlConnection, query, parameters);
+        }
+
+        private void CleanupBobResources()
+        {
+            string query = @"DELETE b
+	FROM BlobResources b
+	LEFT JOIN Resources r
+		ON r.CommunityId = b.CommunityId
+		AND r.ResourceId = b.ResourceId
+	WHERE r.ResourceId IS NULL
+	AND b.CommunityId = @CommunityId; SELECT GETDATE()";
             Dictionary<string, dynamic> parameters = new Dictionary<string, dynamic>();
             parameters.Add("CommunityId", communityId.ToString());
 
@@ -366,6 +398,26 @@ namespace FileShareRepositoryMover.Services
 
             foreach (DataRow row in results.Tables[0].Rows)
             {
+                jos_social_files file = new jos_social_files();
+                file.collection_id = Convert.ToInt32(row["collection_id"]);
+                file.created = Convert.ToDateTime(row["created"]);
+                file.hash = row["hash"].ToString();
+                file.hits = Convert.ToInt32(row["hits"]);
+                file.id = Convert.ToInt32(row["id"]);
+                file.mime = row["mime"].ToString();
+                file.name = row["name"].ToString();
+                file.size = Convert.ToInt32(row["size"]);
+                file.state = Convert.ToInt32(row["state"]);
+                file.storage = row["storage"].ToString();
+                file.type = row["type"].ToString();
+                file.uid = Convert.ToInt32(row["uid"]);
+                file.user_id = Convert.ToInt32(row["user_id"]);
+
+                file.name = file.name.Replace("’", "");
+
+                social_Files.Add(file);
+
+                /*
                 if (folderDictionary.ContainsKey(Convert.ToInt32(row["collection_id"])))
                 {
                     jos_social_files file = new jos_social_files();
@@ -429,6 +481,7 @@ namespace FileShareRepositoryMover.Services
 
                     social_Files.Add(file);
                 }
+                */
             }
         }
 
@@ -458,7 +511,6 @@ namespace FileShareRepositoryMover.Services
                     resource.ClusterType = 2;
                 }
 
-                resource.ClusterType = 2;
                 resource.CommunityId = communityId;
                 resource.DeletedOn = null;
 
@@ -466,9 +518,13 @@ namespace FileShareRepositoryMover.Services
                 {
                     resource.FolderId = folderDictionary[file.collection_id].FolderId;
                 }
+                else if (folderDictionary.ContainsKey(file.uid))
+                {
+                    resource.FolderId = folderDictionary[file.uid].FolderId;
+                }
                 else
                 {
-                    resource.FolderId = folderDictionary[72].FolderId;
+                    resource.FolderId = folderDictionary[Convert.ToInt32(sharedCommunityResources)].FolderId;
                 }
 
                 resource.Metadata = null;
