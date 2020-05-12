@@ -386,6 +386,27 @@ namespace FileShareRepositoryMover.Services
 
                     social_Files.Add(file);
                 }
+                else
+                {
+                    jos_social_files file = new jos_social_files();
+                    file.collection_id = 72;
+                    file.created = Convert.ToDateTime(row["created"]);
+                    file.hash = row["hash"].ToString();
+                    file.hits = Convert.ToInt32(row["hits"]);
+                    file.id = Convert.ToInt32(row["id"]);
+                    file.mime = row["mime"].ToString();
+                    file.name = row["name"].ToString();
+                    file.size = Convert.ToInt32(row["size"]);
+                    file.state = Convert.ToInt32(row["state"]);
+                    file.storage = row["storage"].ToString();
+                    file.type = row["type"].ToString();
+                    file.uid = Convert.ToInt32(row["uid"]);
+                    file.user_id = Convert.ToInt32(row["user_id"]);
+
+                    file.name = file.name.Replace("’", "");
+
+                    social_Files.Add(file);
+                }
             }
         }
 
