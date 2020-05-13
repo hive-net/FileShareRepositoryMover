@@ -43,7 +43,9 @@ namespace FileShareRepositoryMover.Services
                         { "username", userName },
                         { "password", password }
                     };
-                    client.UploadValues(new Uri(loginUrl), "POST", values);
+                    //client.UploadValues(new Uri(loginUrl), "POST", values);
+
+                    client.Headers.Add("Cookie", "_ga=GA1.2.1339439645.1585526228; spcookie_status=ok; joomla_user_state=logged_in; _gid=GA1.2.458589627.1589198759; 6c2c8924f1f6eb5f7781d19482ef7c74=bah6m8616i1f3tiesthaku75jl");
 
                     client.DownloadFile(fileUrl, fileData.FilePath);
                 }
