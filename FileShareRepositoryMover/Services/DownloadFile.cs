@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -18,7 +19,9 @@ namespace FileShareRepositoryMover.Services
 
             string folderPath = "C:\\Temp\\Mover";
             string fileUrl = System.Configuration.ConfigurationManager.AppSettings["Website"].ToString();
+            string loginUrl = System.Configuration.ConfigurationManager.AppSettings["Website"].ToString();
             fileUrl = @"https://" + fileUrl + @"/index.php?option=com_easysocial&view=groups&layout=preview&fileid=" + fileId + @"&tmpl=component";
+            loginUrl = @"https://" + loginUrl + @"/index.php/login";
 
             if (!Directory.Exists(folderPath))
             {
@@ -30,12 +33,18 @@ namespace FileShareRepositoryMover.Services
             fileData.FilePath = folderPath + "\\" + blobFileName;
             fileData.Url = fileUrl;
 
+
             try
             {
                 using (WebClient client = new WebClient())
                 {
-                    string credentials = Convert.ToBase64String(Encoding.ASCII.GetBytes(userName + ":" + password));
-                    client.Headers[HttpRequestHeader.Authorization] = $"Basic {credentials}";
+                    NameValueCollection values = new NameValueCollection
+                    {
+                        { "username", userName },
+                        { "password", password }
+                    };
+                    client.UploadValues(new Uri(loginUrl), "POST", values);
+
                     client.DownloadFile(fileUrl, fileData.FilePath);
                 }
             }
