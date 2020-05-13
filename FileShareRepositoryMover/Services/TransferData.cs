@@ -19,7 +19,7 @@ namespace FileShareRepositoryMover.Services
 
             //ClearLastMove();
             //CleanupFolders();
-            
+
             /*
             PopulateCollections();
             AddTopLevelFolder();
@@ -48,7 +48,6 @@ namespace FileShareRepositoryMover.Services
 
             GetFiles();
             PopulateResources();
-            
         }
 
         private string mssqlConnection = System.Configuration.ConfigurationManager.ConnectionStrings["CollabConnectionString"].ToString();
@@ -546,6 +545,7 @@ namespace FileShareRepositoryMover.Services
 
                 string blobFileName = resource.ResourceId.ToString().Replace("-","");
                 blobFileName += System.IO.Path.GetExtension(file.name);
+                //blobFileName = communityId.ToString().Replace("-", "") + "//" + blobFileName;
 
                 LocalFile local = DownloadFile.GetFile(file.id.ToString(), file.name, blobFileName);
                 BlobFileManager fileManager = new BlobFileManager();
@@ -566,6 +566,8 @@ namespace FileShareRepositoryMover.Services
 
         private void InsertBlobResource(Guid CommunityId, Guid ResourceId, string BlobFileName, string BlobFileType)
         {
+            BlobFileName = communityId.ToString().Replace("-", "") + @"/"  + BlobFileName;
+
             string query = @"INSERT INTO BlobResources (CommunityId,ResourceId,BlobFileName,BlobFileType) VALUES (@CommunityId,@ResourceId,@BlobFileName,@BlobFileType); SELECT GETDATE();";
             Dictionary<string, dynamic> parameters = new Dictionary<string, dynamic>();
             parameters.Add("CommunityId", CommunityId);
