@@ -538,7 +538,7 @@ namespace FileShareRepositoryMover.Services
                 resource.Metadata = null;
                 resource.Mime = file.mime;
                 resource.ModifiedBy = "RepositoryMover";
-                resource.ModifiedOn = DateTime.Now;
+                resource.ModifiedOn = file.created;
                 resource.ResourceDescription = null;
                 resource.ResourceId = Guid.NewGuid();
                 resource.ResourceName = file.name;
