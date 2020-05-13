@@ -151,8 +151,10 @@ namespace FileShareRepositoryMover.Services
                 if (FolderDictionary.ContainsKey(collection.owner_id))
                 {
                     parentFolderId = FolderDictionary[collection.owner_id].FolderId;
-                    folder.ParentFolderId = parentFolderId;
+                    //folder.ParentFolderId = parentFolderId;
+                    folder.ParentFolderId = null;
                     folder.FolderLevel = FolderDictionary[collection.owner_id].FolderLevel + 1;
+                    folder.FolderLevel = 1;
                 }
                 else
                 {

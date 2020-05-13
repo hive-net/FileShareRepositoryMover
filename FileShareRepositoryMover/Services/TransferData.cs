@@ -17,12 +17,15 @@ namespace FileShareRepositoryMover.Services
             social_Files = new List<jos_social_files>();
             resources = new List<Resources>();
 
-            ClearLastMove();
-            //CleanupBobResources();
-            //PopulateCollections();
-            //AddTopLevelFolder();
-            //SetHomeFolder();
-            //BuildFolderDictionary();
+            //ClearLastMove();
+            //CleanupFolders();
+            
+            /*
+            PopulateCollections();
+            AddTopLevelFolder();
+            SetHomeFolder();
+            BuildFolderDictionary();
+            */
 
             FolderStructure folderStructure = new FolderStructure();
 
@@ -45,6 +48,7 @@ namespace FileShareRepositoryMover.Services
 
             GetFiles();
             PopulateResources();
+            
         }
 
         private string mssqlConnection = System.Configuration.ConfigurationManager.ConnectionStrings["CollabConnectionString"].ToString();
@@ -69,15 +73,20 @@ namespace FileShareRepositoryMover.Services
             DataSet results = MssqlActions.QueryResults(mssqlConnection, query, parameters);
         }
 
-        private void CleanupBobResources()
+        private void CleanupFolders()
         {
-            string query = @"DELETE b
-	FROM BlobResources b
+            string query = @"DELETE f
+	FROM Folders f
+	LEFT JOIN Folders c
+		ON c.ParentFolderId = f.FolderId
+		AND c.DeletedOn IS NULL
 	LEFT JOIN Resources r
-		ON r.CommunityId = b.CommunityId
-		AND r.ResourceId = b.ResourceId
-	WHERE r.ResourceId IS NULL
-	AND b.CommunityId = @CommunityId; SELECT GETDATE()";
+		ON r.FolderId = f.FolderId
+		AND r.DeletedOn IS NULL
+	WHERE f.CommunityId = @CommunityId
+	AND f.DeletedOn IS NULL
+	AND c.FolderId IS NULL
+	AND r.ResourceId IS NULL; SELECT GETDATE()";
             Dictionary<string, dynamic> parameters = new Dictionary<string, dynamic>();
             parameters.Add("CommunityId", communityId.ToString());
 
