@@ -554,6 +554,7 @@ namespace FileShareRepositoryMover.Services
                 fileManager.ContainerName = System.Configuration.ConfigurationManager.AppSettings["BlobContainer"].ToString().ToLower();
                 fileManager.FilePath = local.FilePath;
                 fileManager.FolderName = communityId.ToString().Replace("-", "");
+                fileManager.ContentType = file.mime;
                 string returnedBlobName = fileManager.UploadStreamToBlob();
                 InsertResources(resource);
                 InsertBlobResource(communityId, resource.ResourceId, blobFileName, resource.Mime);

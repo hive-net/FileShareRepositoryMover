@@ -22,6 +22,7 @@ namespace FileShareRepositoryMover.Services
         public string FileName { get; set; }
         public string FilePath { get; set; }
         public string FolderName { get; set; }
+        public string ContentType { get; set; }
 
         public string UploadStreamToBlob()
         {
@@ -36,6 +37,7 @@ namespace FileShareRepositoryMover.Services
             CloudBlobDirectory blobFolder = blobContainer.GetDirectoryReference(FolderName);
             //CloudBlockBlob blockBlob = blobContainer.GetBlockBlobReference(BlobFileName);
             CloudBlockBlob blockBlob = blobFolder.GetBlockBlobReference(BlobFileName);
+            blockBlob.Properties.ContentType = ContentType;
             foreach (KeyValuePair<string, string> pair in MetaData)
             {
                 if (pair.Value != null)
