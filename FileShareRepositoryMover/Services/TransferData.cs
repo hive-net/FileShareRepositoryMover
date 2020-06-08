@@ -19,6 +19,7 @@ namespace FileShareRepositoryMover.Services
 
             //ClearLastMove();
             //CleanupFolders();
+            //CleanupFolders();
 
             /*
             PopulateCollections();
