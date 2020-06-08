@@ -66,6 +66,12 @@ namespace FileShareRepositoryMover.Services
         
         private void ClearLastMove()
         {
+            string blobquery = @"DELETE BlobResources WHERE CommunityId = @CommunityId; SELECT GETDATE()";
+            Dictionary<string, dynamic> blobparameters = new Dictionary<string, dynamic>();
+            blobparameters.Add("CommunityId", communityId.ToString());
+
+            DataSet blobresults = MssqlActions.QueryResults(mssqlConnection, blobquery, blobparameters);
+
             string query = @"DELETE Resources WHERE CommunityId = @CommunityId AND ModifiedBy = 'RepositoryMover'; SELECT GETDATE()";
             Dictionary<string, dynamic> parameters = new Dictionary<string, dynamic>();
             parameters.Add("CommunityId", communityId.ToString());
@@ -401,7 +407,7 @@ namespace FileShareRepositoryMover.Services
         private void GetFiles()
         {
             //social_Files = new List<jos_social_files>();
-            string getFiles = @"SELECT * FROM jos_social_files;";
+            string getFiles = @"SELECT * FROM jos_social_files WHERE type IN ('event','group');";
 
             DataSet results = MysqlActions.QueryResults(mysqlConnection, getFiles);
 
