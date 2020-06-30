@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Data;
 
 namespace FileShareRepositoryMover
 {
@@ -10,7 +11,7 @@ namespace FileShareRepositoryMover
     {
         static void Main(string[] args)
         {
-            Services.TransferData transferData = new Services.TransferData();
+            Services.FileTransfer folder = new Services.FileTransfer();
             Console.WriteLine("MIGRATION COMPLETE");
             Console.ReadLine();
         }

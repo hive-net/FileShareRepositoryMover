@@ -189,9 +189,14 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\BlobFileManager.cs" />
     <Compile Include="Services\DownloadFile.cs" />
+    <Compile Include="Services\FileTransfer.cs" />
+    <Compile Include="Services\FolderCreation.cs" />
     <Compile Include="Services\FolderStructure.cs" />
+    <Compile Include="Services\Helper.cs" />
     <Compile Include="Services\MssqlActions.cs" />
     <Compile Include="Services\MysqlActions.cs" />
+    <Compile Include="Services\OrginRequests.cs" />
+    <Compile Include="Services\ProductionRequests.cs" />
     <Compile Include="Services\TransferData.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -199,5 +204,14 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup />
+  <ItemGroup>
+    <EmbeddedResource Include="MySQLQueries\FileNodes.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="MySQLQueries\FilesInNode.sql" />
+    <EmbeddedResource Include="MySQLQueries\NodeData.sql" />
+    <EmbeddedResource Include="MySQLQueries\NodeContentCounts.sql" />
+    <EmbeddedResource Include="MySQLQueries\LinkNodes.sql" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
