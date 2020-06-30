@@ -67,16 +67,22 @@ namespace FileShareRepositoryMover.Services
             DataSet results = MysqlActions.QueryResults(mysqlConnection, query);
             foreach (DataRow row in results.Tables[0].Rows)
             {
-                int fid = Convert.ToInt32(row["fid"].ToString());
-                Dictionary<string, dynamic> file = new Dictionary<string, dynamic>();
-                file.Add("fid", fid);
-                file.Add("nid", Convert.ToInt32(row["nid"].ToString()));
-                file.Add("filename", row["filename"].ToString());
-                file.Add("uri", row["uri"].ToString());
-                file.Add("filemime", row["filemime"].ToString());
-                file.Add("title", row["title"].ToString());
+                string uri = row["uri"].ToString();
+                uri = uri.Replace(@"public://", @"C:\Temp\").Replace(@"/", @"\");
 
-                files.Add(fid, file);
+                if(System.IO.File.Exists(uri))
+                {
+                    int fid = Convert.ToInt32(row["fid"].ToString());
+                    Dictionary<string, dynamic> file = new Dictionary<string, dynamic>();
+                    file.Add("fid", fid);
+                    file.Add("nid", Convert.ToInt32(row["nid"].ToString()));
+                    file.Add("filename", row["filename"].ToString());
+                    file.Add("uri", uri);
+                    file.Add("filemime", row["filemime"].ToString());
+                    file.Add("title", row["title"].ToString());
+
+                    files.Add(fid, file);
+                }
             }
 
             return files;
