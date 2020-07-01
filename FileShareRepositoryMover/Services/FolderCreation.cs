@@ -35,8 +35,8 @@ namespace FileShareRepositoryMover.Services
                 node.Add("vid", Convert.ToInt32(row["vid"].ToString()));
                 node.Add("name", row["name"].ToString());
 
-                Guid folderId = Guid.NewGuid();
-                //Guid folderId = Services.ProductionRequests.CheckAddFolder(communityId, PrimaryNodes[tid]["folderId"], 1, nodeData[nid]["title"]);
+                //Guid folderId = Guid.NewGuid();
+                Guid folderId = Services.ProductionRequests.CheckAddFolder(communityId,null,1, row["name"].ToString());
                 node.Add("folderId", folderId);
 
                 node.Add("parentFolderId", null);
@@ -50,8 +50,8 @@ namespace FileShareRepositoryMover.Services
             generalNode.Add("vid", 30);
             generalNode.Add("name", "General");
 
-            Guid generalFolderId = Guid.NewGuid();
-            //Guid folderId = Services.ProductionRequests.CheckAddFolder(communityId, PrimaryNodes[tid]["folderId"], 1, nodeData[nid]["title"]);
+            //Guid generalFolderId = Guid.NewGuid();
+            Guid generalFolderId = Services.ProductionRequests.CheckAddFolder(communityId, null, 1, "General");
             generalNode.Add("folderId", generalFolderId);
 
             generalNode.Add("parentFolderId", null);
@@ -63,7 +63,7 @@ namespace FileShareRepositoryMover.Services
         private void BuildSecondaryNodes()
         {
             Dictionary<int, dynamic> nodeData = Services.OrginRequests.GetNodeData();
-            Dictionary<int, int> nodeCounts = Services.OrginRequests.GetNodeCounts();
+            Dictionary<int, int> nodeCounts = Services.OrginRequests.NodeActualContentCount();
 
             SecondaryNodes = new Dictionary<int, dynamic>();
 
@@ -85,7 +85,8 @@ namespace FileShareRepositoryMover.Services
 
                     SecondaryNodes.Add(nid, node);
                 }
-                else
+                
+                if (count.Value > 1)
                 {
                     int tid = nodeData[nid]["tid"];
                     node.Add("nid", nid);
@@ -93,8 +94,8 @@ namespace FileShareRepositoryMover.Services
                     node.Add("title", nodeData[nid]["title"]);
                     node.Add("folderName", nodeData[nid]["title"]);
 
-                    Guid folderId = Guid.NewGuid();
-                    //Guid folderId = Services.ProductionRequests.CheckAddFolder(communityId, PrimaryNodes[tid]["folderId"], 2, nodeData[nid]["title"]);
+                    //Guid folderId = Guid.NewGuid();
+                    Guid folderId = Services.ProductionRequests.CheckAddFolder(communityId, PrimaryNodes[tid]["folderId"].ToString(), 2, nodeData[nid]["title"]);
                     node.Add("folderId", folderId);
 
                     node.Add("parentFolderId", PrimaryNodes[tid]["folderId"]);

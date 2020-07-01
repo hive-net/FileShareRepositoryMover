@@ -183,6 +183,7 @@
     <Compile Include="Models\jos_social_clusters.cs" />
     <Compile Include="Models\jos_social_files.cs" />
     <Compile Include="Models\jos_social_files_collections.cs" />
+    <Compile Include="Models\LinkResources.cs" />
     <Compile Include="Models\LocalFile.cs" />
     <Compile Include="Models\Resources.cs" />
     <Compile Include="Program.cs" />
@@ -209,6 +210,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="MySQLQueries\FilesInNode.sql" />
+    <EmbeddedResource Include="MySQLQueries\NodeData2.sql" />
     <EmbeddedResource Include="MySQLQueries\NodeData.sql" />
     <EmbeddedResource Include="MySQLQueries\NodeContentCounts.sql" />
     <EmbeddedResource Include="MySQLQueries\LinkNodes.sql" />

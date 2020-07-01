@@ -28,6 +28,19 @@ namespace FileShareRepositoryMover.Services
             return files;
         }
 
+        public static Dictionary<int, string> GetNodeLinks()
+        {
+            Dictionary<int, string> nodeLinks = new Dictionary<int, string>();
+            string query = Services.Helper.StringLoader("FileShareRepositoryMover.MySQLQueries.LinkNodes.sql");
+            DataSet results = MysqlActions.QueryResults(mysqlConnection, query);
+            foreach(DataRow row in results.Tables[0].Rows)
+            {
+                nodeLinks.Add(Convert.ToInt32(row[0].ToString()), row[1].ToString());
+            }
+
+            return nodeLinks;
+        }
+
         public static Dictionary<int, int> GetNodeCounts()
         {
             Dictionary<int, int> nodes = new Dictionary<int, int>();
@@ -86,6 +99,37 @@ namespace FileShareRepositoryMover.Services
             }
 
             return files;
+        }
+
+        public static Dictionary<int, int> NodeActualContentCount()
+        {
+            Dictionary<int, dynamic> nodeData = GetNodeData();
+            Dictionary<int, string> nodeLinkCounts = GetNodeLinks();
+            Dictionary<int, dynamic> fileData = GetFileData();
+
+            Dictionary<int, int> nodeActualCount = new Dictionary<int, int>();
+
+            foreach(int node in nodeData.Keys)
+            {
+                int content = 0;
+
+                if(nodeLinkCounts.ContainsKey(node))
+                {
+                    content += 1;
+                }
+
+                foreach(Dictionary<string, dynamic> file in fileData.Values)
+                {
+                    if(file["nid"] == node)
+                    {
+                        content += 1;
+                    }
+                }
+
+                nodeActualCount.Add(node, content);
+            }
+
+            return nodeActualCount;
         }
     }
 }

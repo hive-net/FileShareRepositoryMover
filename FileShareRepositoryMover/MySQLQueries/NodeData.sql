@@ -60,7 +60,8 @@ SELECT n.nid,
     JOIN node n
 		ON n.nid = l.entity_id
         AND n.status = '1'
-        AND n.created = d.newestNode;	
+        AND n.created = d.newestNode
+	GROUP BY n.nid;	
     
 DROP TEMPORARY TABLE IF EXISTS linkNewestNodeDate;
 
@@ -100,7 +101,8 @@ SELECT n.nid,
     JOIN node o
 		ON o.nid = n.nid
     LEFT JOIN nodeCategory c
-		ON c.nid = n.nid;
+		ON c.nid = n.nid
+	ORDER BY n.nid;
 
 DROP TEMPORARY TABLE IF EXISTS nodeCategory;
 DROP TEMPORARY TABLE IF EXISTS nodeCounts;

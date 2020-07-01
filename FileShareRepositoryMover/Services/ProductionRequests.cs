@@ -68,7 +68,7 @@ namespace FileShareRepositoryMover.Services
         public static Guid CreateNewFolder(Guid communityId, string parentFolderId, int folderLevel, string folderName)
         {
             Guid folderId = Guid.NewGuid();
-            string query = "INSERT INTO Folder (FolderId,CommunityId,ParentFolderId,FolderLevel,FolderName,ClusterType,ClusterId,CreatedOn) "
+            string query = "INSERT INTO Folders (FolderId,CommunityId,ParentFolderId,FolderLevel,FolderName,ClusterType,ClusterId,CreatedOn) "
                 + "VALUES (@FolderId,@CommunityId,@ParentFolderId,@FolderLevel,@FolderName,@ClusterType,@ClusterId,GETDATE()); SELECT GETDATE()";
             Dictionary<string, dynamic> parameters = new Dictionary<string, dynamic>();
             parameters.Add("FolderId", folderId);
@@ -115,6 +115,42 @@ namespace FileShareRepositoryMover.Services
                 folderId = Guid.NewGuid();
             }
             return folderId;
+        }
+
+        public static void InsertResource(Models.Resources resource)
+        {
+            string query = "INSERT INTO Resources VALUES (@ResourceId,@CommunityId,@FolderId,@ResourceName,@ResourceDescription,@Metadata,@ClusterType,@ClusterId,GETDATE(),'ICN-MOVER',NULL,NULL); SELECT GETDATE()";
+            Dictionary<string, dynamic> parameters = new Dictionary<string, dynamic>();
+            parameters.Add("ResourceId",resource.ResourceId );
+            parameters.Add("CommunityId",resource.CommunityId);
+            parameters.Add("FolderId",resource.FolderId);
+            parameters.Add("ResourceName",resource.ResourceName);
+            parameters.Add("ResourceDescription",resource.ResourceDescription);
+            parameters.Add("Metadata",resource.Metadata);
+            parameters.Add("ClusterType",resource.ClusterType);
+            parameters.Add("ClusterId",resource.ClusterId);
+            DataSet results = Services.MssqlActions.QueryResults(mssqlConnection, query, parameters);
+        }
+
+        public static void InsertBlobResource(Models.BlobResources blobResource)
+        {
+            string query = "INSERT INTO BlobResources VALUES (@ResourceId,@CommunityId,@BlobFileName,@BlobFileType,NULL); SELECT GETDATE()";
+            Dictionary<string, dynamic> parameters = new Dictionary<string, dynamic>();
+            parameters.Add("ResourceId",blobResource.Resourceid);
+            parameters.Add("CommunityId",blobResource.CommunityId);
+            parameters.Add("BlobFileName",blobResource.BlobFileName);
+            parameters.Add("BlobFileType",blobResource.BlobFileType);
+            DataSet results = Services.MssqlActions.QueryResults(mssqlConnection, query, parameters);
+        }
+
+        public static void InsertLinkResource(Models.LinkResources linkResource)
+        {
+            string query = "INSERT INTO LinkResources VALUES (@ResourceId,@CommunityId,@LinkUrl); SELECT GETDATE()";
+            Dictionary<string, dynamic> parameters = new Dictionary<string, dynamic>();
+            parameters.Add("ResourceId", linkResource.Resourceid);
+            parameters.Add("CommunityId", linkResource.CommunityId);
+            parameters.Add("LinkUrl", linkResource.LinkUrl);
+            DataSet results = Services.MssqlActions.QueryResults(mssqlConnection, query, parameters);
         }
     }
 }
