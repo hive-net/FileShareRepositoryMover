@@ -44,7 +44,7 @@ namespace FileShareRepositoryMover.Services
                 resource.ResourceName = file["filename"];
                 resource.ResourceDescription = resourceDescription;
                 resource.ClusterType = 2;
-                resource.ClusterId = "93";
+                resource.ClusterId = "98";
                 resource.ModifiedOn = DateTime.Now;
                 resource.ModifiedBy = "RepositoryMover";
 
@@ -101,7 +101,7 @@ namespace FileShareRepositoryMover.Services
                 resource.ResourceName = folders.SecondaryNodes[nid]["title"];
                 resource.ResourceDescription = resourceDescription;
                 resource.ClusterType = 2;
-                resource.ClusterId = "93";
+                resource.ClusterId = "98";
                 resource.ModifiedOn = DateTime.Now;
                 resource.ModifiedBy = "RepositoryMover";
 
