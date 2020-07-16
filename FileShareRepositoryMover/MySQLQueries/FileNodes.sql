@@ -32,6 +32,7 @@ SELECT m.fid,
         AND n.type = 'pin'
         AND n.status = '1'
         AND n.created = nf.newestNode
+        AND from_unixtime(n.created) >= '2018-01-01'
 	LEFT JOIN field_data_field_image i
 		ON i.field_image_fid = m.fid
 	WHERE i.field_image_fid IS NULL;

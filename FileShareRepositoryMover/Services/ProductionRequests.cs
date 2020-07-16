@@ -152,5 +152,14 @@ namespace FileShareRepositoryMover.Services
             parameters.Add("LinkUrl", linkResource.LinkUrl);
             DataSet results = Services.MssqlActions.QueryResults(mssqlConnection, query, parameters);
         }
+
+        public static void InsertResourceKeyWord(Guid resourceId, string keyword)
+        {
+            string query = "INSERT INTO ResourceKeywords VALUES (@Keyword,@ResourceId); SELECT GETDATE()";
+            Dictionary<string, dynamic> parameters = new Dictionary<string, dynamic>();
+            parameters.Add("ResourceId", resourceId);
+            parameters.Add("Keyword", keyword);
+            DataSet results = Services.MssqlActions.QueryResults(mssqlConnection, query, parameters);
+        }
     }
 }

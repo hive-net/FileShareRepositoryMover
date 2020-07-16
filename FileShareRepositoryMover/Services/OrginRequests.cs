@@ -131,5 +131,69 @@ namespace FileShareRepositoryMover.Services
 
             return nodeActualCount;
         }
+
+        public static List<string> GetNodeKeyWords(int nid)
+        {
+            List<string> keywords = new List<string>();
+
+            string query = "SELECT td.name FROM taxonomy_index ti JOIN taxonomy_term_data td ON td.tid = ti.tid AND td.vid = 1 WHERE ti.nid = " + nid.ToString() + " GROUP BY td.name";
+            DataSet results = MysqlActions.QueryResults(mysqlConnection, query);
+
+            foreach(DataRow row in results.Tables[0].Rows)
+            {
+                keywords.Add(row[0].ToString());
+            }
+
+            return keywords;
+        }
+
+        public static string GetFileDescription(int nid, int fid)
+        {
+            string query = "SELECT field_add_file_description FROM field_data_field_add_file WHERE entity_id = " + nid.ToString() + " AND field_add_file_fid = " + fid.ToString() + " GROUP BY field_add_file_description;";
+            DataSet results = MysqlActions.QueryResults(mysqlConnection, query);
+
+            string description;
+
+            if (results.Tables[0].Rows.Count > 0)
+            {
+                description = results.Tables[0].Rows[0][0].ToString();
+            }
+            else
+            {
+                description = null;
+            }
+
+            if (string.IsNullOrWhiteSpace(description))
+            {
+                query = "SELECT title FROM node WHERE nid = " + nid.ToString() + ";";
+                results = MysqlActions.QueryResults(mysqlConnection, query);
+
+                if (results.Tables[0].Rows.Count > 0)
+                {
+                    description = results.Tables[0].Rows[0][0].ToString();
+                }
+            }
+
+            return description;
+        }
+
+        public static string GetNodeTitle(int nid)
+        {
+            string query = "SELECT title FROM node WHERE nid = " + nid.ToString() + ";";
+            DataSet results = MysqlActions.QueryResults(mysqlConnection, query);
+
+            string description;
+
+            if (results.Tables[0].Rows.Count > 0)
+            {
+                description = results.Tables[0].Rows[0][0].ToString();
+            }
+            else
+            {
+                description = null;
+            }
+
+            return description;
+        }
     }
 }

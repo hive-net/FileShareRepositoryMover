@@ -28,14 +28,21 @@ namespace FileShareRepositoryMover.Services
             foreach (Dictionary<string, dynamic> file in fileData.Values)
             {
                 int nid = file["nid"];
+                int fid = file["fid"];
                 Guid folderId = folders.SecondaryNodes[nid]["folderId"];
                 string filePath = file["uri"];
+                string resourceDescription = Services.OrginRequests.GetFileDescription(nid, fid);
+
+                resourceDescription = resourceDescription.Replace("&#39;","'");
+                resourceDescription = resourceDescription.Replace("&amp;", "&");
+                resourceDescription = resourceDescription.Replace("&nbsp;", " ");
 
                 Models.Resources resource = new Models.Resources();
                 resource.ResourceId = Guid.NewGuid();
                 resource.CommunityId = CommunityId;
                 resource.FolderId = folderId;
                 resource.ResourceName = file["filename"];
+                resource.ResourceDescription = resourceDescription;
                 resource.ClusterType = 2;
                 resource.ClusterId = "93";
                 resource.ModifiedOn = DateTime.Now;
@@ -54,6 +61,14 @@ namespace FileShareRepositoryMover.Services
                 blobResource.BlobFileType = file["filemime"];
 
                 Services.ProductionRequests.InsertBlobResource(blobResource);
+
+                List<string> keywords = Services.OrginRequests.GetNodeKeyWords(nid);
+                foreach(string keyword in keywords)
+                {
+                    Services.ProductionRequests.InsertResourceKeyWord(resource.ResourceId, keyword);
+                }
+
+
                 Services.BlobFileManager blobFileManager = new BlobFileManager();
                 blobFileManager.BlobFileName = resource.ResourceId.ToString().Replace("-", "").ToLower() + fileExtension;
                 blobFileManager.ContainerName = System.Configuration.ConfigurationManager.AppSettings["BlobContainer"].ToString();
@@ -73,12 +88,18 @@ namespace FileShareRepositoryMover.Services
                 string uri = link.Value;
                 Guid resourceId = Guid.NewGuid();
                 Guid folderId = folders.SecondaryNodes[nid]["folderId"];
+                string resourceDescription = Services.OrginRequests.GetNodeTitle(nid);
+
+                resourceDescription = resourceDescription.Replace("&#39;", "'");
+                resourceDescription = resourceDescription.Replace("&amp;", "&");
+                resourceDescription = resourceDescription.Replace("&nbsp;", " ");
 
                 Models.Resources resource = new Models.Resources();
                 resource.CommunityId = CommunityId;
                 resource.ResourceId = resourceId;
                 resource.FolderId = folderId;
                 resource.ResourceName = folders.SecondaryNodes[nid]["title"];
+                resource.ResourceDescription = resourceDescription;
                 resource.ClusterType = 2;
                 resource.ClusterId = "93";
                 resource.ModifiedOn = DateTime.Now;
@@ -92,6 +113,12 @@ namespace FileShareRepositoryMover.Services
                 linkResource.LinkUrl = uri;
 
                 Services.ProductionRequests.InsertLinkResource(linkResource);
+
+                List<string> keywords = Services.OrginRequests.GetNodeKeyWords(nid);
+                foreach (string keyword in keywords)
+                {
+                    Services.ProductionRequests.InsertResourceKeyWord(resource.ResourceId, keyword);
+                }
 
                 Console.WriteLine(folders.SecondaryNodes[nid]["title"]);
             }
